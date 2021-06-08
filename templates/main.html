@@ -3,7 +3,7 @@
   <head>
 
     <!-- Webpage Title -->
-    <title>Hello, world!</title>
+    <title>MAIN | TODAY'S MOOD</title>
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -14,6 +14,8 @@
       <!-- Font Awesome CSS -->
       <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
+    <!-- icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -89,10 +91,22 @@
 
   </head>
   <body>
-  <p class="logout-btn" onclick="logout()">로그아웃</p>
-    <h1 style="margin-left: 45%"> {{name}}'s Mood</h1>
+      <div class="hero is-primary">
+            <div class="hero-body">
+                    <div class="navbar-menu" id="navbarMenuHeroA">
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <p class="button is-primary is-inverted" onclick="logout()">
+                                    <i class="fas fa-sign-out-alt"></i>로그아웃</p>
+                            </div>
+                        </div>
+                    </div>
+                 <h1 style="margin-left: 45%" class="title"> {{name}} 'S MOOD</h1>
+            </div>
+      </div>
+
     <div style="margin-left: 50%; width: 100px; height: 100px; background-color: aquamarine; padding-top: 20px; padding-left: 5px;">
-      <p style="text-align: center">MONTH</p>
+      <p style="text-align: center">{{currentMonth}} MONTH</p>
     </div>
     <div class="full-box" style="width: 1200px; margin-left: 350px; padding: 30px">
         <div class="each-box" style="height: 400px; width: 350px; border: 3px solid black">
@@ -128,8 +142,14 @@
     </div>
 
     <button id="btn_main" onclick="location.href='/write'"> + </button>
-  <footer>
-
-  </footer>
+  <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
+          <a href="#">MIT</a>. The website content
+          is licensed <a href="#/">CC BY NC SA 4.0</a>.
+        </p>
+      </div>
+    </footer>
   </body>
 </html>
