@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <!-- Webpage Title -->
+        <title>로그인창</title>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+
+        <script>
+            function login() {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/login",
+                    data: {id_give: $('#userid').val(), pw_give: $('#userpw').val()},
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            $.cookie('mytoken', response['token']);
+                            alert('로그인 하였습니다!');
+                            window.location.href = '/main'
+                        } else {
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+        </script>
+
+    </head>
+    <body>
+	<h1 class="title">Today's Mood</h1>
+	<label class="label" for="userid">ID</label>
+    <input type="text" class="input" id="userid" placeholder="ID를 입력해주세요">
+
+    <label class="label" for="userpw">PW</label>
+    <input type="password" class="input" id="userpw" placeholder="패스워드를 입력해주세요">
+    <button onclick=location.href='/signup'>회원가입</button>
+    <button onclick="login()">로그인</button>
+
+
+    </body>
+</html>

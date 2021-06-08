@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+    <head>
+
+        <!-- Webpage Title -->
+        <title>회원가입</title>
+
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
+
+        <script>
+            // 간단한 회원가입 함수입니다.
+            // 아이디, 비밀번호, 닉네임을 받아 DB에 저장합니다.
+            function register() {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/signup",
+                    data: {
+                        id_give: $('#user_id').val(),
+                        pw_give: $('#user_pw').val(),
+                        name_give: $('#user_name').val()
+                    },
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            alert('회원가입이 완료되었습니다.')
+                            window.location.href = '/login'
+                        } else {
+                            alert(response['msg'])
+                        }
+                    }
+                })
+            }
+
+        </script>
+    <body>
+    <div class="home">
+        <h1>TODAY'S MOOD</h1>
+    </div>
+</header>
+<section>
+    <div class="part1">
+            <table class="table">
+                <caption>
+                    <h3>ENROLLMENT</h3>
+                </caption>
+                <tr>
+                    <th>
+                        ID
+                    </th>
+                    <td>
+                        <input type="text" id="user_id" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        PASSWORD
+                    </th>
+                    <td>
+                        <input type="password" id="user_pw" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        PASSWORD CONFIRM
+                    </th>
+                    <td>
+                        <input type="password" name="user_pwconf" />
+                        <input type="button" value="check" onclick="conf()" />
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        NAME
+                    </th>
+                    <td>
+                        <input type="text" id="user_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button onclick="register()"/> OK </buttion>
+                    </td>
+                </tr>
+            </table>
+
+    </div>
+</section>
+<footer>
+    <h6>
+
+    </h6>
+</footer>
+</body>
+</html>
