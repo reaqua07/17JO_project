@@ -37,30 +37,35 @@ def home():
         return redirect(url_for("login"))
 
 
-@app.route('/login')
-def login():
-    msg = request.args.get("msg")
-    return render_template('login.html')
+# @app.route('/login')
+# def login():
+#     msg = request.args.get("msg")
+#     return render_template('signup.html', msg=msg)
 
 
 @app.route('/signup')
 def register():
-    return render_template('signup.html')
+    msg = request.args.get("msg")
+    return render_template('signup.html', msg=msg)
+
 
 @app.route('/main')
 def main():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     user_info = db.user.find_one({"id": payload['id']})
-    return render_template('main.html', name = user_info['name'])
+    return render_template('main.html', name=user_info['name'])
+
 
 @app.route('/write')
 def write():
     return render_template('write.html')
 
+
 @app.route('/edit')
 def edit():
     return render_template('edit.html')
+
 
 #################################
 ##  로그인을 위한 API            ##
@@ -69,10 +74,10 @@ def edit():
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
 # 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/api/signup', methods=['POST'])
+@app.route('/api/signup/ok', methods=['POST'])
 def api_register():
     id_receive = request.form['id_give']
-    pw_receive = request.form['pw_g ive']
+    pw_receive = request.form['pw_give']
     name_receive = request.form['name_give']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
@@ -99,20 +104,30 @@ def api_login():
             'id': id_receive,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         return jsonify({'result': 'success', 'token': token})
 
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
+
+@app.route('/api/signup/check_dup', methods=['POST'])
+def check_dup():
+    # id 중복확인
+    id_receive = request.form['id_give']
+    exists = bool(db.users.find_one({"id": id_receive}))
+    return jsonify({'result': 'success', 'exists': exists})
+
+
 @app.route('/api/main', methods=['GET'])
 def listing():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     user_info = db.user.find_one({"id": payload['id']})
-    diaries = list(db.articles.find({'name':user_info['name']}, {'_id': False}))
+    diaries = list(db.articles.find({'name': user_info['name']}, {'_id': False}))
     return jsonify({'user_diaries': diaries})
+
 
 @app.route('/api/name', methods=['GET'])
 def api_valid():
