@@ -53,7 +53,9 @@ def main():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     user_info = db.user.find_one({"id": payload['id']})
-    return render_template('main.html', name=user_info['name'])
+    date = datetime.datetime.today()
+    month = date.month
+    return render_template('main.html', name=user_info['name'], currentMonth=month)
 
 
 @app.route('/write')
