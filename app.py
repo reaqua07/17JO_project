@@ -37,16 +37,15 @@ def home():
         return redirect(url_for("login"))
 
 
-# @app.route('/login')
-# def login():
-#     msg = request.args.get("msg")
-#     return render_template('signup.html', msg=msg)
+@app.route('/login')
+def login():
+    msg = request.args.get("msg")
+    return render_template('login.html')
 
 
 @app.route('/signup')
 def register():
-    msg = request.args.get("msg")
-    return render_template('signup.html', msg=msg)
+    return render_template('signup.html')
 
 
 @app.route('/main')
@@ -74,10 +73,10 @@ def edit():
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
 # 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/api/signup/ok', methods=['POST'])
+@app.route('/api/signup', methods=['POST'])
 def api_register():
     id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
+    pw_receive = request.form['pw_g ive']
     name_receive = request.form['name_give']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
@@ -104,20 +103,12 @@ def api_login():
             'id': id_receive,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
 
         return jsonify({'result': 'success', 'token': token})
 
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
-
-@app.route('/api/signup/check_dup', methods=['POST'])
-def check_dup():
-    # id 중복확인
-    id_receive = request.form['id_give']
-    exists = bool(db.users.find_one({"id": id_receive}))
-    return jsonify({'result': 'success', 'exists': exists})
 
 
 @app.route('/api/main', methods=['GET'])
@@ -127,6 +118,29 @@ def listing():
     user_info = db.user.find_one({"id": payload['id']})
     diaries = list(db.articles.find({'name': user_info['name']}, {'_id': False}))
     return jsonify({'user_diaries': diaries})
+
+
+@app.route('/write', methods=['POST'])
+def write_review():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({"id": payload['id']})
+    weather_receive = request.form.get('weather_give')
+    mood_receive = request.form.get('mood_give')
+    content_receive = request.form.get('content_give')
+    date_receive = request.form.get('date_give')
+    doc = {
+        'mood': mood_receive,
+        'weather': weather_receive,
+        'content': content_receive,
+        'date': date_receive,
+        'id' : user_info['id']
+    }
+    db.diaries.insert_one(doc)
+    null = None
+    db.diaries.delete_many({'mood': null})
+
+    return jsonify({'result': 'success'})
 
 
 @app.route('/api/name', methods=['GET'])
