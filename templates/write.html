@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:value="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Today's Mood_Write</title>
@@ -23,6 +23,10 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
+
+
+
+
     <!-- datepicker 는 jquery 1.7.1 이상 bootstrap 2.0.4 이상 버전이 필요함 -->
     <!-- jQuery가 먼저 로드 된 후 datepicker가 로드 되어야함.-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
@@ -33,7 +37,31 @@
 
 
     <script>
-        // document.getElementById('currentDate').value = new Date().toISOString().substring(0, 10);
+        function posting() {
+
+            let mood = $('#mood').val()
+            let weather = $('#weather').val()
+            let content = $('#content').val()
+            let date = $('#date').val()
+            $.ajax({
+                    type: "POST",
+                    url: "/write",
+                    data: {
+                        content_give : content,
+                        mood_give : mood,
+                        weather_give : weather,
+                        date_give : date
+                    },
+                    success: function (response) {
+                        if (response['result'] == 'success') {
+                            alert('포스팅 완료!')
+                            window.location.href = '/main'
+                        }
+                    }
+                })
+            }
+
+
         $('#currentDate').change(function (){
             let date = $('#currentDate').val();
             alert(date);
@@ -60,7 +88,7 @@
 </header>
 <section>
     <div class="part1">
-        <form action="writeOk" method="post" name="frm">
+        <form method="post" id="frm">
             <table>
                 <caption>WHAT'S YOUR MOOD TODAY</caption>
                 <tr>
@@ -68,7 +96,7 @@
                         DATE
                     </th>
                     <td>
-                        <input type="date" name="cal" id="currentDate"/>
+                        <input type="date" id="date"/>
                     </td>
                 </tr>
                 <tr>
@@ -76,13 +104,13 @@
                         MOOD
                     </th>
                     <td>
-                        <select class="emo" name="mood">
-                            <option>HAPPY</option>
-                            <option>SAD</option>
-                            <option>ANGRY</option>
-                            <option>BOARD</option>
-                            <option>EXCITING</option>
-                            <option>SO SO</option>
+                        <select class="emo" id="mood">
+                            <option value="happy">HAPPY</option>
+                            <option value="sad">SAD</option>
+                            <option value="angry">ANGRY</option>
+                            <option value="board">BOARD</option>
+                            <option value="exciting">EXCITING</option>
+                            <option value="so_so">SO SO</option>
                         </select>
                     </td>
                 </tr>
@@ -91,26 +119,13 @@
                         WEATHER
                     </th>
                     <td>
-                        <select class="weather" name="weather">
-                            <option>&#xf6d5 SUNNY</option>
-                            <option>&#xf005 FOGGY</option>
-                            <option>RAINY</option>
-                            <option>CLOUDY</option>
-                            <option>SNOWY</option>
-                            <option>WINDY</option>
-                            <option>COOL</option>
-                            <option>HOT</option>
-                            <option>STORMY</option>
+                        <select class="weather" id="weather">
+                            <option value="sunny">&#xf6d5 SUNNY</option>
+                            <option value="foggy">&#xf005 FOGGY</option>
+                            <option value="rainy">RAINY</option>
+                            <option value="cloudy">CLOUDY</option>
+                            <option value="snowy">SNOWY</option>
                         </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        ATTACHED FILE
-                    </th>
-                    <td>
-                        <input type="file" name="file" accept="image/png, image/jpg"/>
-                        <i class="fas fa-bolt"></i>
                     </td>
                 </tr>
                 <tr>
@@ -118,26 +133,22 @@
                         CONTENT
                     </th>
                     <td>
-                        <textarea cols="50" rows="30" name="content"></textarea>
+                        <textarea cols="50" rows="30" id="content"> </textarea>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="submit" value="SAVE"/>
+                        <button type="submit" onclick="posting()"> 저장 </button>
                     </td>
                 </tr>
             </table>
         </form>
     </div>
 </section>
-  <footer class="footer">
-      <div class="content has-text-centered">
-        <p>
-          <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
-          <a href="#">MIT</a>. The website content
-          is licensed <a href="#/">CC BY NC SA 4.0</a>.
-        </p>
-      </div>
-    </footer>
+<footer>
+    <h6>
+
+    </h6>
+</footer>
 </body>
 </html>
