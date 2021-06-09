@@ -37,10 +37,10 @@ def home():
         return redirect(url_for("login"))
 
 
-@app.route('/login')
-def login():
-    msg = request.args.get("msg")
-    return render_template('login.html')
+# @app.route('/login')
+# def login():
+#     msg = request.args.get("msg")
+#     return render_template('login.html')
 
 
 @app.route('/signup')
