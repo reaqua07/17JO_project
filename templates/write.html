@@ -2,12 +2,18 @@
 <html lang="en" xmlns:value="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Today's Mood_Write</title>
+    <title>WRITE | TODAY'S MOOD</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css">
 
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <!-- Font Awesome CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -43,6 +49,7 @@
             let weather = $('#weather').val()
             let content = $('#content').val()
             let date = $('#date').val()
+
             $.ajax({
                     type: "POST",
                     url: "/write",
@@ -66,6 +73,47 @@
             let date = $('#currentDate').val();
             alert(date);
         });
+
+        function showDiaries() {
+            $.ajax({
+                type: "GET",
+                url: "/api/main",
+                data: {},
+                success: function (response) {
+
+                        let diaries = response.user_diaries
+
+                        for (let i = 0; i < diaries.length; i++) {
+
+                            let date = diaries[i]['date'];
+                            let weather = diaries[i]['weather'];
+                            let mood = diaries[i]['mood'];
+                            let content = diaries[i]['content'];
+                            let _id = diaries[i]['_id'];
+
+                            let temp_html =`
+                                       <article class="tile is-child box" id="${_id}>
+                                            <input type="hidden" value="${_id}" />
+                                            <span class="subtitle">${mood}</span>
+                                            <span class="subtitle">${weather}</span>
+                                            <div><p class="title">${date}</p></div>
+                                            <div class="content">
+                                                <p>${content}</p>
+                                            </div>
+                                            <div class="buttons">
+                                                <button class="button is-primary is-light" onclick="edit()">EDIT</button>
+                                            </div>
+                                        </article>`
+
+                                  $('#full-box').append(temp_html)
+                            window.location.href = '/main'
+
+                        }
+                    }
+
+            })
+        }
+
     </script>
 
     <style>
@@ -82,73 +130,82 @@
 </head>
 <body>
 <header>
-    <div class="home">
-        <h1>TODAY'S MOOD</h1>
+    <div class="hero is-primary">
+        <div class="hero-body">
+            <div class="navbar-menu" id="navbarMenuHeroA">
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <p class="button is-primary is-inverted" onclick="logout()">
+                            <span><i class="fas fa-sign-out-alt"></i></span>&nbsp LOGOUT</p>
+                    </div>
+                </div>
+            </div>
+            <h1 style="margin-left: 45%" class="title"> {{name}} 'S MOOD</h1>
+        </div>
     </div>
 </header>
 <section>
     <div class="part1">
-        <form method="post" id="frm">
-            <table>
-                <caption>WHAT'S YOUR MOOD TODAY</caption>
-                <tr>
-                    <th>
-                        DATE
-                    </th>
-                    <td>
-                        <input type="date" id="date"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        MOOD
-                    </th>
-                    <td>
-                        <select class="emo" id="mood">
-                            <option value="happy">HAPPY</option>
-                            <option value="sad">SAD</option>
-                            <option value="angry">ANGRY</option>
-                            <option value="board">BOARD</option>
-                            <option value="exciting">EXCITING</option>
-                            <option value="so_so">SO SO</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        WEATHER
-                    </th>
-                    <td>
-                        <select class="weather" id="weather">
+        <div class="title">
+            <div id="content-title" class="title">
+                WHAT'S YOUR MOOD TODAY
+            </div>
+        </div>
+        <form class="row g-3">
+            <div class="col-md-4">
+                <p class="form-label title is-5">DATE</p>
+                <input type="date" class="form-control" id="date">
+<!--                <p class="form-label title is-6" id="help-date">경고</p>-->
+            </div>
+            <div class="col-md-4">
+                    <label class="form-label title is-5">MOOD</label>
+                    <select class="emo form-control" id="mood">
+                                <option value="happy">HAPPY</option>
+                                <option value="sad">SAD</option>
+                                <option value="angry">ANGRY</option>
+                                <option value="board">BOARD</option>
+                                <option value="exciting">EXCITING</option>
+                                <option value="so_so">SO SO</option>
+                    </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label title is-5">WEATHER</label>
+                <select class="weather form-control" id="weather">
                             <option value="sunny">&#xf6d5 SUNNY</option>
                             <option value="foggy">&#xf005 FOGGY</option>
                             <option value="rainy">RAINY</option>
                             <option value="cloudy">CLOUDY</option>
                             <option value="snowy">SNOWY</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        CONTENT
-                    </th>
-                    <td>
-                        <textarea cols="50" rows="30" id="content"> </textarea>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button type="submit" onclick="posting()"> 저장 </button>
-                    </td>
-                </tr>
-            </table>
+                </select>
+            </div>
+            <div class="col-12 field">
+                <div class="control">
+                    <label class="form-label title is-5">CONTENT</label>
+                    <textarea class="form-control textarea is-normal" id="content">
+                    </textarea>
+                </div>
+            </div>
+            <div>
+                <button class="button is-primary is-rounded is-large" onclick="posting()" >
+                    <i class="fas fa-save"></i>
+                </button>
+                <span>
+                    <button class="button is-primary is-rounded is-large" onclick="showDiaries()" >
+                    <i class="fas fa-undo-alt"></i>
+                    </button>
+                </span>
+            </div>
         </form>
     </div>
 </section>
-<footer>
-    <h6>
-
-    </h6>
-</footer>
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
+                <a href="#">MIT</a>. The website content
+                is licensed <a href="#/">CC BY NC SA 4.0</a>.
+            </p>
+        </div>
+    </footer>
 </body>
 </html>

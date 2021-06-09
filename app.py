@@ -60,7 +60,10 @@ def main():
 
 @app.route('/write')
 def write():
-    return render_template('write.html')
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({"id": payload['id']})
+    return render_template('write.html', name=user_info['name'])
 
 
 @app.route('/edit')
@@ -117,9 +120,24 @@ def api_login():
 def listing():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    user_info = db.user.find_one({"id": payload['id']})
-    diaries = list(db.articles.find({'name': user_info['name']}, {'_id': False}))
+    user_info = db.user.find_one({'id': payload['id']})
+    diaries = list(db.diaries.find({'id': user_info['id']}))
+
+    for diary in diaries:
+        diary["_id"] = str(diary["_id"])
+
     return jsonify({'user_diaries': diaries})
+
+
+@app.route('/api/edit', methods=['GET'])
+def popup():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({'id': payload['id']})
+    diary = db.diaries.find_one({'id': user_info['id']})
+    diary["_id"] = str(diary["_id"])
+
+    return jsonify({'diary': diary})
 
 
 @app.route('/write', methods=['POST'])
@@ -136,7 +154,7 @@ def write_review():
         'weather': weather_receive,
         'content': content_receive,
         'date': date_receive,
-        'id' : user_info['id']
+        'id': user_info['id']
     }
     db.diaries.insert_one(doc)
     null = None
