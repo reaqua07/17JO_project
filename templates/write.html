@@ -28,13 +28,13 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="resources/css/plugin/datepicker/bootstrap-datepicker.css">
+    
 
     <!-- css -->
     <link rel="stylesheet" href="/static/mycss.css">
 
-
-    <!-- datepicker 는 jquery 1.7.1 이상 bootstrap 2.0.4 이상 버전이 필요함 -->
-    <!-- jQuery가 먼저 로드 된 후 datepicker가 로드 되어야함.-->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="resources/css/plugin/datepicker/bootstrap-datepicker.css">
 
@@ -72,45 +72,13 @@
             })
         }
 
-        function showDiaries() {
-            $.ajax({
-                type: "GET",
-                url: "/api/main",
-                data: {},
-                success: function (response) {
 
-                    let diaries = response.user_diaries
+        $('#currentDate').change(function () {
+            let date = $('#currentDate').val();
+            alert(date);
+        });
 
-                    for (let i = 0; i < diaries.length; i++) {
 
-                        let date = diaries[i]['date'];
-                        let weather = diaries[i]['weather'];
-                        let mood = diaries[i]['mood'];
-                        let content = diaries[i]['content'];
-                        let _id = diaries[i]['_id'];
-
-                        let temp_html = `
-                                       <article class="tile is-child box" id="${_id}>
-                                            <input type="hidden" value="${_id}" />
-                                            <span class="subtitle">${mood}</span>
-                                            <span class="subtitle">${weather}</span>
-                                            <div><p class="title">${date}</p></div>
-                                            <div class="content">
-                                                <p>${content}</p>
-                                            </div>
-                                            <div class="buttons">
-                                                <button id="editbtn" class="button is-primary is-light" onclick="edit()">EDIT</button>
-                                                <button id="delbtn" class="button is-danger is-light" onclick='deletediaries("${_id}")'>DELETE</button>
-                                            </div>
-                                        </article>`
-
-                        $('#full-box').append(temp_html)
-                        window.location.href = '/main'
-
-                    }
-                }
-            })
-        }
 
     </script>
 
@@ -138,8 +106,8 @@
                     </div>
                 </div>
             </div>
-            <div class="center font-title">
-                <p class="title "> {{name}} 'S MOOD</p>
+            <div class="center ">
+                <p class="title font-title"> {{name}} 'S MOOD</p>
             </div>
         </div>
     </div>
@@ -172,8 +140,8 @@
                 <div class="col-md-4">
                     <label class="form-label title is-5">WEATHER</label>
                     <select class="weather form-control" id="weather">
-                        <option value="sunny">&#xf6d5 SUNNY</option>
-                        <option value="foggy">&#xf005 FOGGY</option>
+                        <option value="sunny">SUNNY</option>
+                        <option value="foggy">FOGGY</option>
                         <option value="rainy">RAINY</option>
                         <option value="cloudy">CLOUDY</option>
                         <option value="snowy">SNOWY</option>
@@ -191,9 +159,6 @@
                         <i class="fas fa-save"></i>
                     </button>
                     <span class="back-btn">
-                    <button class="button is-primary is-rounded is-large" onclick="showDiaries()">
-                    <i class="fas fa-undo-alt"></i>
-                    </button>
                 </span>
                 </div>
             </form>
