@@ -50,7 +50,7 @@
     display: block;
     margin-left: 908px;
     margin-top: 530px;
-    position: fixed;
+    position: absolute;
 }
 
 .btn_month {
