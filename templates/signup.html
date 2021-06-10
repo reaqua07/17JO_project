@@ -22,6 +22,13 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
+        <!-- css -->
+        <link rel="stylesheet" href="/static/mycss.css" >
+
+        <!-- font -->
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&display=swap" rel="stylesheet">
+
         <script>
 
             // 로그인
@@ -130,16 +137,18 @@
             // 유효성 검사
             function check_dup(){
 
+                let user_id = $("#user_id").val()
+
                 // 아이디 유효성 검사
                 // 아이디칸 공란
-                if($("#user_id").val() == ""){
+                if(user_id == ""){
                     $("#help-id").text("아이디를 입력해 주세요.").removeClass("is-safe").addClass("is-danger")
                     $("#user_id").focus()
                     return;
                 }
 
                 // 아이디칸 형식 확인
-                if(!is_id($("#user_id").val())){
+                if(!is_id(user_id)){
                     $("#help-id").text("아이디의 형식을 확인해 주세요. 영문과 숫자, 일부 특수문자(._-) 사용 가능. 2-10자 길이").removeClass("is-safe").addClass("is-danger")
                     $("#user_id").focus()
                     return;
@@ -151,11 +160,11 @@
                     type : "POST",
                     url : "/api/signup/check_dup",
                     data : {
-                        id_give : $("#user_id").val()
+                        id_give : user_id
                     },
                     success : function (response){
                         if (response["exists"]){
-                            $("help-id").text("이미 존재하는 아이디입니다.").removeClass("is-safe").addClass("is-danger")
+                            $("#help-id").text("이미 존재하는 아이디입니다.").removeClass("is-safe").addClass("is-danger")
                             $("#user_id").focus()
                         }else{
                             $("#help-id").text("사용 가능한 아이디입니다.").removeClass("is-danger").addClass("is-success")
@@ -193,29 +202,35 @@
             }
 
         </script>
+        <style>
+
+
+        </style>
     </head>
     <body>
     <header class="hero is-primary">
-        <div class="header hero-body">
-            <p class="title">TODAY'S MOOD</p>
+        <div class="header hero-body center">
+            <p class="title font-title">TODAY'S MOOD</p>
         </div>
     </header>
     <section>
-        <div class="title">
+        <div class="title center title-padding">
             <div id="content-title" class="title">
                 LOG IN
             </div>
             <div id="content-title2" class="is-hidden title">
-                <h3>ENROLLMENT</h3>
+                ENROLLMENT
             </div>
         </div>
-        <div class="content box">
+        <div class="content box content-box">
             <div class="id-field field">
                 <label class="label">ID</label>
                 <input type="text" class="input" id="user_id" placeholder="ID"/>
-                <span id="btn-check-dup" class="is-hidden">
-                   <button class="button is-primary" onclick="check_dup()">중복확인</button>
-                </span>
+                <div class="btn-check-dup">
+                    <span id="btn-check-dup" class="is-hidden">
+                       <button class="button is-primary" onclick="check_dup()">중복확인</button>
+                    </span>
+                </div>
             </div>
             <div class="id-info-field field">
                 <p id="help-id" class="help is-hidden">아이디는 2-10자의 영문과 숫자와 일부 특수문자(._-)만 입력 가능합니다.</p>
@@ -239,7 +254,7 @@
                     <input type="password" class="input" id="user_pwconf" placeholder="********" />
                 </div>
                 <div class="pwconf-info-field field">
-                    <p id="help-password2" class="help">비밀번호를 다시 한 번 입력해주세요.</p>
+                    <p id="help-password2" class="help is-hidden">비밀번호를 다시 한 번 입력해주세요.</p>
                 </div>
             </div>
             <div id="name-field" class="is-hidden field">
@@ -254,17 +269,19 @@
                 </button>
             </div>
         </div>
-</div>
-
+    </div>
 </section>
-  <footer class="footer">
-      <div class="content has-text-centered">
-        <p>
-          <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
-          <a href="#">MIT</a>. The website content
-          is licensed <a href="#/">CC BY NC SA 4.0</a>.
-        </p>
+
+  <footer>
+      <div class="footer">
+          <div class="content has-text-centered">
+            <p>
+              <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
+              <a href="#">MIT</a>. The website content
+              is licensed <a href="#/">CC BY NC SA 4.0</a>.
+            </p>
+          </div>
       </div>
-    </footer>
+  </footer>
 </body>
 </html>

@@ -21,74 +21,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
 
-    <style>
-        .each-box {
-            float: left;
-            margin-left: 35px;
-            margin-top: 30px;
-        }
+    <!-- css -->
+    <link rel="stylesheet" href="/static/mycss.css">
 
-        #btn_main {
-            display: block;
-            position: fixed;
-            margin-left: 50%;
-            margin-top: 520px;
-            border-radius: 100%;
-            height: 90px;
-            width: 90px;
-            font-size: 50px;
-            background-color: #e76471;
-
-        }
-
-        .logout-btn {
-            width: 1200px;
-            margin: auto;
-            text-align: right;
-            display: block;
-            font-size: 12px;
-        }
-
-        .logout-btn:hover {
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .image-div{
-            margin: auto;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            position: relative;
-
-        }
-
-        .image{
-            margin : auto;
-            display: block;
-            position: relative;
-        }
-
-        .image-text-container{
-            display: block;
-            margin: auto;
-            text-align: center;
-        }
-
-        .image-text{
-            width: 110px;
-            height: 50px;
-            display: block;
-            margin: auto;
-            text-align: center;
-            padding-top:10px;
-            font-size: 20px;
-            font-weight: bold;
-            color: black;
-            position: absolute;
-            background-color: #cbcbcb;
-        }
-
-    </style>
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&display=swap" rel="stylesheet">
 
     <script>
         // 로그아웃은 내가 가지고 있는 토큰만 쿠키에서 없애면 됩니다.
@@ -103,117 +41,404 @@
             showDiaries();
         });
 
-
-            function edit(){
-                $("#modal-post").addClass("is-active")
-                $.ajax({
-                    type: "GET",
-                    url: "/api/edit",
-                    data: {},
-                    success: function (response) {
-                        let diary = response.diary
-                        let _id = diary['_id']
-
-                        console.log(_id, $("#hidden").val())
-
-                        if ($("#hidden").val() == _id) {
-                            let date = diary['date'];
-                            let weather = diary['weather'];
-                            let mood = diary['mood'];
-                            let content = diary['content'];
-
-                            console.log(date, weather, mood, content)
-
-                            $("#modal-date").text(date)
-                            $("#modal-weather").text(weather)
-                            $("#modal-mood").text(mood)
-                            $("#modal-content").text(content)
-                        }
-                    }
-                })
-            }
-
-
         function showDiaries() {
             $.ajax({
                 type: "GET",
                 url: "/api/main",
                 data: {},
                 success: function (response) {
-                        let diaries = response.user_diaries
+                    let diaries = response.user_diaries
 
-                        for (let i = 0; i < diaries.length; i++) {
+                    for (let i = 0; i < diaries.length; i++) {
 
-                            let date = diaries[i]['date'];
-                            let weather = diaries[i]['weather'];
-                            let mood = diaries[i]['mood'];
-                            let content = diaries[i]['content'];
-                            let _id = diaries[i]['_id'];
+                        let date = diaries[i]['date'];
+                        let weather = diaries[i]['weather'];
+                        let mood = diaries[i]['mood'];
+                        let content = diaries[i]['content'];
+                        let _id = diaries[i]['_id'];
+                        let weather_class = ""
+                        let mood_class = ""
+                        if(weather === "sunny"){
+                            weather_class = "fas fa-sun fa-2x"
+                        }
+                        if(weather === "foggy"){
+                            weather_class = "fas fa-smog fa-2x"
+                        }
+                        if(weather === "rainy"){
+                            weather_class = "fas fa-umbrella fa-2x"
+                        }
+                        if(weather === "cloudy"){
+                            weather_class = "fas fa-cloud fa-2x"
+                        }
+                        if(weather === "snowy"){
+                            weather_class = "fas fa-snowflake fa-2x"
+                        }
+                         if(mood === "happy"){
+                            mood_class = "fas fa-laugh-squint fa-2x"
+                        }
+                         if(mood === "sad"){
+                            mood_class = "fas fa-sad-tear fa-2x"
+                        }
+                         if(mood === "exciting"){
+                            mood_class = "fas fa-grin-tongue-wink fa-2x"
+                        }
+                         if(mood === "board"){
+                            mood_class = "fas fa-tired fa-2x"
+                        }
+                         if(mood === "angry"){
+                            mood_class = "fas fa-angry fa-2x"
+                        }
+                         if(mood === "so_so"){
+                            mood_class = "fas fa-meh fa-2x"
+                        }
+                        let temp_html = `
+                                       <article class="tile is-child box">
 
-                            let temp_html =`
-                                       <article class="tile is-child box" id="${_id}">
-                                            <input type="hidden" value="${_id}" id="hidden" />
-                                            <span class="subtitle">${mood}</span>
-                                            <span class="subtitle">${weather}</span>
+                                            <span class="${mood_class}"></span>
+                                            <span class="${weather_class}"></span>
                                             <div><p class="title">${date}</p></div>
                                             <div class="content">
                                                 <p>${content}</p>
                                             </div>
                                             <div class="buttons">
-                                                <button id="editbtn" class="button is-primary is-light" onclick='edit()'>EDIT</button>
+                                                <button class="button is-primary is-light" onclick='edit("${_id}")'>EDIT</button>
+                                                <button class="button is-danger is-light" onclick='deletediaries("${_id}")'>DELETE</button>
                                             </div>
                                         </article>`
+                        $('#full-box').append(temp_html)
+                        // window.location.reload()
 
-                                  $('#full-box').append(temp_html)
-                            // window.location.reload()
-
-                        }
                     }
+                }
 
             })
         }
 
+        function showMonthDiaries() {
+            $.ajax({
+                type: "GET",
+                url: "/api/main",
+                data: {},
+                success: function (response) {
+                    let diaries = response.user_diaries
+                    let selected_year = $('#yeah_sl').val()
+                    let selected_month = $('#month_sl').val()
+                    for (let i = 0; i < diaries.length; i++) {
+                        let date = diaries[i]['date']
+                        let weather = diaries[i]['weather']
+                        let mood = diaries[i]['mood']
+                        let content = diaries[i]['content']
+                        let _id = diaries[i]['_id']
+                        let year = diaries[i]['date_year']
+                        let month = diaries[i]['date_month']
+
+                        let weather_class = ""
+                        let mood_class = ""
+                        if(weather === "sunny"){
+                            weather_class = "fas fa-sun fa-2x"
+                        }
+                        if(weather === "foggy"){
+                            weather_class = "fas fa-smog fa-2x"
+                        }
+                        if(weather === "rainy"){
+                            weather_class = "fas fa-umbrella fa-2x"
+                        }
+                        if(weather === "cloudy"){
+                            weather_class = "fas fa-cloud fa-2x"
+                        }
+                        if(weather === "snowy"){
+                            weather_class = "fas fa-snowflake fa-2x"
+                        }
+                         if(mood === "happy"){
+                            mood_class = "fas fa-laugh-squint fa-2x"
+                        }
+                         if(mood === "sad"){
+                            mood_class = "fas fa-sad-tear fa-2x"
+                        }
+                         if(mood === "exciting"){
+                            mood_class = "fas fa-grin-tongue-wink fa-2x"
+                        }
+                         if(mood === "board"){
+                            mood_class = "fas fa-tired fa-2x"
+                        }
+                         if(mood === "angry"){
+                            mood_class = "fas fa-angry fa-2x"
+                        }
+                         if(mood === "so_so"){
+                            mood_class = "fas fa-meh fa-2x"
+                        }
+
+                        if (selected_year === year) {
+                            if (selected_month === month) {
+                                let temp_html = `
+                                       <article class="tile is-child box" id="${_id}">
+                                            <span class="${mood_class}"></span>
+                                            <span class="${weather_class}"></span>
+                                            <div><p class="title">${date}</p></div>
+                                            <div class="content">
+                                                <p>${content}</p>
+                                            </div>
+                                            <div class="buttons">
+                                                <button class="button is-primary is-light" onclick='edit("${_id}")'>EDIT</button>
+                                                <button class="button is-danger is-light" onclick='deletediaries("${_id}")'>DELETE</button>
+                                            </div>
+                                        </article>`
+                                $('#full-box').append(temp_html)
+                            }
+                        }
+                    }
+                }
+
+            })
+        }
+
+        function edit(_id) {
+            $("#modal-post").addClass("is-active")
+            $.ajax({
+                type: "GET",
+                url: "/api/main",
+                data: {},
+                success: function (response) {
+                    let diary = response.user_diaries
+                    let selected_id = _id
+                    console.log(selected_id)
+                    for (let i = 0; i < diary.length; i++) {
+                        let date = diary[i]['date'];
+                        let weather = diary[i]['weather'];
+                        let mood = diary[i]['mood'];
+                        let content = diary[i]['content'];
+                        let id = diary[i]['_id']
+
+                        if (id === selected_id) {
+                            $('#date').val(date)
+                            $('#weather').val(weather)
+                            $('#mood').val(mood)
+                            $('#content').val(content)
+                        }
+                    }
+                }
+            })
+        }
+
+        function saveEdit(selected_id) {
+
+            let mood = $('#mood').val()
+            let weather = $('#weather').val()
+            let content = $('#content').val()
+            let date = $('#date').val()
+            let id = selected_id
+            console.log(selected_id)
+            $.ajax({
+                type: "POST",
+                url: "/api/edit",
+                data: {
+                    content_give: content,
+                    mood_give: mood,
+                    weather_give: weather,
+                    date_give: date,
+                    id_give: id
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        console.log(id)
+                        alert('수정 완료!')
+                        window.location.href = '/main'
+                    }
+                }
+            })
+        }
+
+        function deletediaries(_id) {
+            $("#modal-del").addClass("is-active")
+            $.ajax({
+                type: "GET",
+                url: "/api/main",
+                data: {},
+                success: function (response) {
+                    let diary = response.user_diaries
+                    let selected_id = _id
+                    console.log(selected_id)
+                    for (let i = 0; i < diary.length; i++) {
+                        let date = diary[i]['date'];
+                        let weather = diary[i]['weather'];
+                        let mood = diary[i]['mood'];
+                        let content = diary[i]['content'];
+                        let id = diary[i]['_id']
+
+                        if (id === selected_id) {
+                            $('#date').val(date)
+                            $('#weather').val(weather)
+                            $('#mood').val(mood)
+                            $('#content').val(content)
+                        }
+                    }
+                }
+            })
+        }
+
+        function deleteConfirm(selected_id) {
+            let date = $('#date').val()
+
+            $.ajax({
+                type: "POST",
+                url: "/api/delete",
+                data: {
+                    date_give: date
+                },
+                success: function (response) {
+                    if (response['result'] == 'success') {
+                        alert('삭제 완료!')
+                        window.location.href = '/main'
+                    }
+                }
+            })
+        }
+
     </script>
-
-
 </head>
 <body>
 <header>
-<div class="hero is-primary">
-    <div class="hero-body">
-        <div class="navbar-menu" id="navbarMenuHeroA">
-            <div class="navbar-end">
-                <div class="navbar-item">
-                    <p class="button is-primary is-inverted" onclick="logout()">
-                        <span><i class="fas fa-sign-out-alt"></i></span>&nbsp LOGOUT</p>
+    <div class="hero is-primary">
+        <div class="hero-body">
+            <div class="navbar-menu" id="navbarMenuHeroA">
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <p class="button is-primary is-inverted" onclick="logout()">
+                            <span><i class="fas fa-sign-out-alt"></i></span>&nbsp LOGOUT</p>
+                    </div>
                 </div>
+            </div>
+            <div class="center font-color">
+                <p class="title font-title">{{name}} 'S MOOD</p>
             </div>
         </div>
-        <h1 style="margin-left: 45%" class="title"> {{name}} 'S MOOD</h1>
+    </div>
+</header>
+
+<div class="btn_month">
+    <button id="btn_mon" onclick='$("#modal-month").addClass("is-active")'>
+        <div class="btn_month-title">M</div>
+    </button>
+</div>
+<div class="btn_write">
+    <button class="button is-primary is-rounded is-large" onclick="location.href='/write'">
+        <i class="fas fa-pen"></i>
+    </button>
+</div>
+
+
+<div class="modal-total">
+    <div class="modal" id="modal-month">
+        <div class="modal-background" onclick='$("#modal-month").removeClass("is-active")'></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">CALENDAR</p>
+                <button class="delete" aria-label="close"
+                        onclick='$("#modal-month").removeClass("is-active")'></button>
+            </header>
+            <section class="modal-card-body" id="modal-month-contents">
+                <form class="row g-3">
+                    <div class="year-part col-md-5">
+                        <div class="select is-primary is-large">
+                            <select id="yeah_sl" class="form-control">
+                                <option value="2021">2021</option>
+                                <option value="2020">2020</option>
+                                <option value="2019">2019</option>
+                                <option value="2018">2018</option>
+                                <option value="2017">2017</option>
+                                <option value="2016">2016</option>
+                                <option value="2015">2015</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="month-part col-md-5">
+                        <div class="select month_btn is-primary is-large">
+                            <select id="month_sl" class="form-control">
+                                <option value="01">1월</option>
+                                <option value="02">2월</option>
+                                <option value="03">3월</option>
+                                <option value="04">4월</option>
+                                <option value="05">5월</option>
+                                <option value="06">6월</option>
+                                <option value="07">7월</option>
+                                <option value="08">8월</option>
+                                <option value="09">9월</option>
+                                <option value="10">10월</option>
+                                <option value="11">11월</option>
+                                <option value="12">12월</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </section>
+            <footer class="modal-card-foot button-modal-month">
+                <button class="button is-info"
+                        onclick='$("#full-box").empty();showMonthDiaries();$("#modal-month").removeClass("is-active")'>
+                    Ok
+                </button>
+                <button class="button is-danger" onclick='$("#modal-month").removeClass("is-active")'>Cancel</button>
+            </footer>
+        </div>
     </div>
 </div>
-</header>
-    <div class="image-div">
-        <figure class="image is-128x128">
-            <img class="is-rounded" src="https://bulma.io/images/placeholders/128x128.png">
-        </figure>
-            <div class="image-text-container">
-                <div class="image-text">
-                    <p>{{currentMonth}} MONTH</p>
-                </div>
-            </div>
-    </div>
 
-    <div class="full-box tile is-parent" id="full-box">
-        <article class="tile is-child box">
-            <span><p class="subtitle">기분</p></span>
-            <span><p class="subtitle">날씨</p></span>
-            <div><p class="title">날짜</p></div>
-            <div class="content">
-                <p></p>
-            </div>
-        </article>
+<div class="modal" id="modal-del">
+    <div class="modal-background" onclick='$("#modal-del").removeClass("is-active")'></div>
+    <div class="modal-card">
+        <header class="modal-card-head" style="border: 5px #cbcbcb">
+            <p id='delete_msg' class="modal-card-title">삭제하시겠습니까?</p>
+            <button class="delete" aria-label="close"
+                    onclick='$("#modal-del").removeClass("is-active")'></button>
+        </header>
+        <section class="modal-card-body" style="background-color: #f5f5f5">
+            <button id="dele_btn" class="button is-success" onclick="deleteConfirm()">확인</button>
+            <button id="delcan_btn" class="button" onclick='$("#modal-del").removeClass("is-active")'>취소</button>
+        </section>
     </div>
+</div>
+
+<div class="tile is-ancestor button-test">
+    <div class="tile is-vertical is-8" id="is-vertical">
+        <div class="tile">
+            <div class="full-box tile is-parent is-vertical" id="full-box">
+                <article class="tile is-child box">
+                    <span><p class="subtitle">기분</p></span>
+                    <span><p class="subtitle">날씨</p></span>
+                    <div><p class="title">날짜</p></div>
+                    <div class="content">
+                        <p></p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--    <div class="modal-total">-->
+<!--        <div class="modal" id="modal-post">-->
+<!--            <div class="modal-background" onclick='$("#modal-post").removeClass("is-active")'></div>-->
+<!--            <div class="modal-card">-->
+<!--                <header class="modal-card-head">-->
+<!--                    <p class="modal-card-title">DIARY</p>-->
+<!--                    <button class="delete" aria-label="close"-->
+<!--                            onclick='$("#modal-post").removeClass("is-active")'></button>-->
+<!--                </header>-->
+<!--                <section class="modal-card-body" id="modal-contents">-->
+<!--                    <div>-->
+<!--                        <div id="modal-date"></div>-->
+<!--                        <div id="modal-mood"></div>-->
+<!--                        <div id="modal-weather"></div>-->
+<!--                        <div id="modal-content"></div>-->
+<!--                    </div>-->
+<!--                </section>-->
+<!--                <footer class="modal-card-foot">-->
+<!--                    <button class="button is-success">Save changes</button>-->
+<!--                    <button class="button" onclick='$("#modal-post").removeClass("is-active")'>Cancel</button>-->
+<!--                </footer>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
 <div class="modal-total">
     <div class="modal" id="modal-post">
         <div class="modal-background" onclick='$("#modal-post").removeClass("is-active")'></div>
@@ -224,33 +449,58 @@
                         onclick='$("#modal-post").removeClass("is-active")'></button>
             </header>
             <section class="modal-card-body" id="modal-contents">
-                <div>
-                    <div id="modal-date"></div>
-                    <div id="modal-mood"></div>
-                    <div id="modal-weather"></div>
-                    <div id="modal-content"></div>
-                </div>
+                <form class="row g-3">
+                    <div class="col-md-4">
+                        <p class="form-label title is-5">DATE</p>
+                        <input type="text" class="form-control" id="date" readonly="readonly">
+                        <!--                <p class="form-label title is-6" id="help-date">경고</p>-->
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label title is-5">MOOD</label>
+                        <select class="emo form-control" id="mood">
+                            <option value="happy">HAPPY</option>
+                            <option value="sad">SAD</option>
+                            <option value="angry">ANGRY</option>
+                            <option value="board">BOARD</option>
+                            <option value="exciting">EXCITING</option>
+                            <option value="so_so">SO SO</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label title is-5">WEATHER</label>
+                        <select class="weather form-control" id="weather" aria-readonly="false">
+                            <option value="sunny">&#xf6d5 SUNNY</option>
+                            <option value="foggy">&#xf005 FOGGY</option>
+                            <option value="rainy">RAINY</option>
+                            <option value="cloudy">CLOUDY</option>
+                            <option value="snowy">SNOWY</option>
+                        </select>
+                    </div>
+                    <div class="col-12 field">
+                        <div class="control">
+                            <label class="form-label title is-5">CONTENT</label>
+                            <textarea class="form-control textarea is-normal" id="content">
+                        </textarea>
+                        </div>
+                    </div>
+                </form>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-success">Save changes</button>
+                <button id="save_btn" class="button is-success" onclick="saveEdit()">Save changes</button>
                 <button class="button" onclick='$("#modal-post").removeClass("is-active")'>Cancel</button>
             </footer>
         </div>
     </div>
 </div>
-    <div>
-        <button class="button is-primary is-rounded is-large" onclick="location.href='/write'" >
-            <i class="fas fa-pen"></i>
-        </button>
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>
+            <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
+            <a href="#">MIT</a>. The website content
+            is licensed <a href="#/">CC BY NC SA 4.0</a>.
+        </p>
     </div>
-    <footer class="footer">
-        <div class="content has-text-centered">
-            <p>
-                <strong>Today's Mood</strong> by <a href="#">17JO_PROJECT_01</a>. The source code is licensed
-                <a href="#">MIT</a>. The website content
-                is licensed <a href="#/">CC BY NC SA 4.0</a>.
-            </p>
-        </div>
-    </footer>
+</footer>
 </body>
 </html>

@@ -55,7 +55,7 @@ def main():
     user_info = db.user.find_one({"id": payload['id']})
     date = datetime.datetime.today()
     month = date.month
-    return render_template('main.html', name=user_info['name'], currentMonth=month)
+    return render_template('main.html', name=user_info['name'][1:], currentMonth=month)
 
 
 @app.route('/write')
@@ -63,7 +63,7 @@ def write():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     user_info = db.user.find_one({"id": payload['id']})
-    return render_template('write.html', name=user_info['name'])
+    return render_template('write.html', name=user_info['name'][1:])
 
 
 @app.route('/edit')
@@ -78,10 +78,10 @@ def edit():
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
 # 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/api/signup', methods=['POST'])
+@app.route('/api/signup/ok', methods=['POST'])
 def api_register():
     id_receive = request.form['id_give']
-    pw_receive = request.form['pw_g ive']
+    pw_receive = request.form['pw_give']
     name_receive = request.form['name_give']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
@@ -116,6 +116,39 @@ def api_login():
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
 
 
+@app.route('/api/signup/check_dup', methods=['POST'])
+def check_dup():
+    # id 중복확인
+    id_receive = request.form['id_give']
+    exists = bool(db.user.find_one({"id": id_receive}))
+    print(id_receive, exists)
+    return jsonify({'result': 'success', 'exists': exists})
+
+
+@app.route('/api/main', methods=['GET'])
+def editlisting():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({'id': payload['id']})
+    diaries = list(db.diaries.find({'id': user_info['id']}))
+    for diary in diaries:
+        diary["_id"] = str(diary["_id"])
+
+    return jsonify({'user_diaries': diaries})
+
+
+@app.route('/api/main', methods=['GET'])
+def monthlisting():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({'id': payload['id']})
+    diaries = list(db.diaries.find({'id': user_info['id']}))
+    for diary in diaries:
+        diary["_id"] = str(diary["_id"])
+
+    return jsonify({'user_diaries': diaries})
+
+
 @app.route('/api/main', methods=['GET'])
 def listing():
     token_receive = request.cookies.get('mytoken')
@@ -129,15 +162,40 @@ def listing():
     return jsonify({'user_diaries': diaries})
 
 
-@app.route('/api/edit', methods=['GET'])
-def popup():
+# @app.route('/api/edit', methods=['GET'])
+# def popup():
+#     token_receive = request.cookies.get('mytoken')
+#     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+#     user_info = db.user.find_one({'id': payload['id']})
+#     diary = db.diaries.find_one({'id': user_info['id']})
+#     diary["_id"] = str(diary["_id"])
+#
+#     return jsonify({'diary': diary})
+
+@app.route('/api/edit', methods=['POST'])
+def editSave():
     token_receive = request.cookies.get('mytoken')
     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    user_info = db.user.find_one({'id': payload['id']})
-    diary = db.diaries.find_one({'id': user_info['id']})
-    diary["_id"] = str(diary["_id"])
+    user_info = db.user.find_one({"id": payload['id']})
+    weather_receive = request.form.get('weather_give')
+    mood_receive = request.form.get('mood_give')
+    content_receive = request.form.get('content_give')
+    date_receive = request.form.get('date_give')
 
-    return jsonify({'diary': diary})
+    db.diaries.update_one({'id': user_info['id'], 'date': date_receive}, {'$set': {'mood': mood_receive}})
+    db.diaries.update_one({'id': user_info['id'], 'date': date_receive}, {'$set': {'weather': weather_receive}})
+    db.diaries.update_one({'id': user_info['id'], 'date': date_receive}, {'$set': {'content': content_receive}})
+    return jsonify({'result': 'success'})
+
+
+@app.route('/api/delete', methods=['POST'])
+def deletedia():
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    user_info = db.user.find_one({"id": payload['id']})
+    date_receive = request.form.get('date_give')
+    db.diaries.delete_one({'id': user_info['id'], 'date': date_receive})
+    return jsonify({'result': 'success'})
 
 
 @app.route('/write', methods=['POST'])
@@ -154,6 +212,8 @@ def write_review():
         'weather': weather_receive,
         'content': content_receive,
         'date': date_receive,
+        'date_year': date_receive.split('-')[0],
+        'date_month': date_receive.split('-')[1],
         'id': user_info['id']
     }
     db.diaries.insert_one(doc)
